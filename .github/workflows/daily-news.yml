@@ -28,21 +28,11 @@ jobs:
       - name: Send email
         uses: dawidd6/action-send-mail@v3
         with:
-          server_address: smtp.office365.com # CHANGE THIS to your email provider's SMTP server
-          server_port: 587                   # CHANGE THIS if your provider uses 465 instead of 587
-          username: ${{ secrets.EMAIL_USER }}
-          password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: Daily Market Update
-          html_body: file://news_body.txt
-          to: ${{ secrets.EMAIL_RECIPIENT }}
-         - name: Send email
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.office365.com 
+          server_address: smtp.office365.com # CHANGE THIS if you do not use Outlook/Hotmail
           server_port: 587                   
           username: ${{ secrets.EMAIL_USER }}
           password: ${{ secrets.EMAIL_PASSWORD }}
           subject: Daily Market Update
           html_body: file://news_body.txt
           to: ${{ secrets.EMAIL_RECIPIENT }}
-          from: "Daily Bot <your-actual-email@example.com>" # Type your actual email here
+          from: ${{ secrets.EMAIL_USER }}
