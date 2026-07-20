@@ -23,7 +23,7 @@ def send_email():
         sg.send(message)
         print("Email sent successfully!")
     except Exception as e:
-        print(f"Error sending email: {e}")
+        print(f"Error: {e}")
 
 if __name__ == "__main__":
     send_email()
