@@ -1,12 +1,3 @@
-name: send-news
-
-on:
-  push:
-    branches:
-      - main
-  schedule:
-    - cron: '0 9 * * *' # Runs daily at 9:00 AM
-
 jobs:
   send-news:
     runs-on: ubuntu-latest
@@ -23,23 +14,16 @@ jobs:
         run: pip install requests
 
       - name: Run main script
-        id: news_script
-        run: |
-          # Capture output from python so we can use it in the email
-          python main.py > news_body.txt
-        env:
-          # Keep your secrets here if needed by main.py
-          SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+        run: python main.py > news_body.txt
 
       - name: Send email
         uses: dawidd6/action-send-mail@v3
         with:
-          server_address: smtp.gmail.com
-          server_port: 465
+          server_address: smtp.office365.com # Update if using a different provider
+          server_port: 587
           username: ${{ secrets.EMAIL_USER }}
           password: ${{ secrets.EMAIL_PASSWORD }}
           subject: Daily Market Update
-          # This reads the file created by your python script
           html_body: file://news_body.txt
           to: ${{ secrets.EMAIL_RECIPIENT }}
-          from: Daily Bot
+          from: ${{ secrets.EMAIL_USER }} # Must be the same as username for most providers
