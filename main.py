@@ -4,12 +4,17 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
 def fetch_news():
-    # .strip() added to clean inputs
     api_key = os.getenv("ALPHA_VANTAGE_API_KEY", "").strip()
     url = f"https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers=SPY&limit=1&apikey={api_key}"
-    response = requests.get(url).json()
-    return response.get("feed", [{}])[0].get("title", "No market news today.")
-
+    
+    response = requests.get(url)
+    
+    if response.status_code == 403:
+        print(f"Server returned 403. Response text: {response.text}")
+        return "News fetch failed: Forbidden"
+    
+    data = response.json()
+    return data.get("feed", [{}])[0].get("title", "No market news today.")
 def send_email():
     title = fetch_news()
     # .strip() added to all env variables to prevent header errors
