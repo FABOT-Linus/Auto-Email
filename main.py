@@ -17,12 +17,15 @@ def send_email():
         subject='Daily Market Update',
         html_content=f'<strong>Today\'s Headline:</strong><br>{title}'
     )
+    
     try:
         sg = SendGridAPIClient(os.getenv("SENDGRID_API_KEY"))
-        sg.send(message)
-        print("Email sent successfully!")
+        response = sg.send(message)
+        print(f"Status Code: {response.status_code}")
+        print(f"Body: {response.body}")
+        print(f"Headers: {response.headers}")
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"Full Error Details: {e}")
 
 if __name__ == "__main__":
     send_email()
