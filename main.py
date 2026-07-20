@@ -150,7 +150,9 @@ def main():
         error_msg = result[1]
         print(f"Error: {error_msg}")
         subject = f"⚠️ Stock News Bot Error — {datetime.now().strftime('%A, %B %d')}"
-        body_text = f"Could not fetch news today.\n\nError: {error_msg}"
+        body_text = f"Could not fetch news today.
+
+Error: {error_msg}"
         body_html = f"<p>Could not fetch news today.</p><p>Error: {error_msg}</p>"
         send_email(subject, body_html, body_text)
         return
