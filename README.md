@@ -1,1 +1,1 @@
-# Stock News Email Bot
+# News Email Bot
