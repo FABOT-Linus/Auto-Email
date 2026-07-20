@@ -17,7 +17,6 @@ def send_email():
         subject='Daily Market Update',
         html_content=f'<strong>Today\'s Headline:</strong><br>{title}'
     )
-    
     try:
         sg = SendGridAPIClient(os.getenv("SENDGRID_API_KEY"))
         sg.send(message)
