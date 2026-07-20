@@ -2,7 +2,6 @@ name: Daily Stock Market News Email
 
 on:
   schedule:
-    # 9:40 AM ET = 13:40 UTC, Monday-Friday
     - cron: '40 13 * * 1-5'
   workflow_dispatch:
 
@@ -13,8 +12,10 @@ jobs:
     - uses: actions/checkout@v4
     - uses: actions/setup-python@v5
       with:
-        python-version: '3.11'
-    - run: pip install -r requirements.txt
+        python-version: '3.12'
+    - run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
     - run: python main.py
       env:
         ALPHA_VANTAGE_API_KEY: ${{ secrets.ALPHA_VANTAGE_API_KEY }}
