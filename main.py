@@ -7,12 +7,17 @@ def fetch_news():
     api_key = os.getenv("ALPHA_VANTAGE_API_KEY", "").strip()
     url = f"https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers=SPY&limit=1&apikey={api_key}"
     
-    response = requests.get(url)
+    # Adding a header to identify the request
+    headers = {'User-Agent': 'Mozilla/5.0'}
     
-    if response.status_code == 403:
-        print(f"Server returned 403. Response text: {response.text}")
-        return "News fetch failed: Forbidden"
+    response = requests.get(url, headers=headers)
     
+    # Check if the status is not 200 (OK)
+    if response.status_code != 200:
+        print(f"Fetch failed with status code: {response.status_code}")
+        print(f"Response content: {response.text}")
+        return "Failed to fetch news."
+        
     data = response.json()
     return data.get("feed", [{}])[0].get("title", "No market news today.")
 def send_email():
