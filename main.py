@@ -1,11 +1,6 @@
 #!/usr/bin/env python3
-"""
-US Stock Market News Email Bot
-Fetches the latest US stock market headline and emails it to you.
-Runs Monday-Friday at 9:40 AM ET.
-"""
-
 import os
+import sys
 import smtplib
 import ssl
 import requests
@@ -13,7 +8,7 @@ from datetime import datetime
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-# ─── Configuration (loaded from GitHub Secrets) ───
+# ─── Configuration ───
 ALPHA_VANTAGE_API_KEY = os.getenv("ALPHA_VANTAGE_API_KEY")
 SMTP_SERVER = os.getenv("SMTP_SERVER", "smtp.gmail.com")
 SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
@@ -21,12 +16,23 @@ EMAIL_SENDER = os.getenv("EMAIL_SENDER")
 EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
 EMAIL_RECIPIENT = os.getenv("EMAIL_RECIPIENT", EMAIL_SENDER)
 
+# Validate env vars
+missing = []
+if not ALPHA_VANTAGE_API_KEY:
+    missing.append("ALPHA_VANTAGE_API_KEY")
+if not EMAIL_SENDER:
+    missing.append("EMAIL_SENDER")
+if not EMAIL_PASSWORD:
+    missing.append("EMAIL_PASSWORD")
+if not EMAIL_RECIPIENT:
+    missing.append("EMAIL_RECIPIENT")
+
+if missing:
+    print(f"ERROR: Missing environment variables: {', '.join(missing)}")
+    sys.exit(1)
+
 
 def fetch_stock_news():
-    """
-    Fetch latest US stock market news using Alpha Vantage News API.
-    Free tier: 5 calls/minute, 500 calls/day.
-    """
     url = "https://www.alphavantage.co/query"
     params = {
         "function": "NEWS_SENTIMENT",
@@ -56,7 +62,6 @@ def fetch_stock_news():
 
 
 def send_email(subject, body_html, body_text):
-    """Send email using SMTP."""
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
     msg["From"] = EMAIL_SENDER
@@ -76,9 +81,7 @@ def send_email(subject, body_html, body_text):
 
 
 def build_email_content(title, source, url_link, summary):
-    """Build email subject and body."""
     today = datetime.now().strftime("%A, %B %d, %Y")
-
     subject = f"📈 US Stock Market News — {today}"
 
     body_text = f"""US Stock Market News — {today}
@@ -142,7 +145,6 @@ Sent by your Stock News Bot
 
 
 def main():
-    """Main entry point."""
     print("Fetching latest US stock market news...")
 
     result = fetch_stock_news()
