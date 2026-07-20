@@ -30,7 +30,6 @@ def get_market_news():
     return html_content
 
 def send_email(html_content):
-    # Ensure these secrets are still configured in your GitHub repo
     sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
     message = Mail(
         from_email=os.environ.get('EMAIL_SENDER'),
@@ -43,8 +42,7 @@ def send_email(html_content):
         response = sg.send(message)
         print(f"Email sent successfully! Status Code: {response.status_code}")
     except Exception as e:
-        print(f"Error sending email: {e}")
-
-if __name__ == "__main__":
-    news_html = get_market_news()
-    send_email(news_html)
+        # The 'e' object from SendGrid often contains the specific rejection reason
+        print(f"Detailed Error: {e}")
+        if hasattr(e, 'body'):
+            print(f"Response Body: {e.body}")
