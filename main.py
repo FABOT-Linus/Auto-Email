@@ -1,29 +1,29 @@
 #!/usr/bin/env python3
+"""
+US Stock Market News Email Bot (SendGrid Version)
+"""
+
 import os
 import sys
-import smtplib
-import ssl
 import requests
 from datetime import datetime
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 
 # ─── Configuration ───
 ALPHA_VANTAGE_API_KEY = os.getenv("ALPHA_VANTAGE_API_KEY")
-SMTP_SERVER = os.getenv("SMTP_SERVER", "smtp.gmail.com")
-SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
+SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
 EMAIL_SENDER = os.getenv("EMAIL_SENDER")
-EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
 EMAIL_RECIPIENT = os.getenv("EMAIL_RECIPIENT", EMAIL_SENDER)
 
 # Validate env vars
 missing = []
 if not ALPHA_VANTAGE_API_KEY:
     missing.append("ALPHA_VANTAGE_API_KEY")
+if not SENDGRID_API_KEY:
+    missing.append("SENDGRID_API_KEY")
 if not EMAIL_SENDER:
     missing.append("EMAIL_SENDER")
-if not EMAIL_PASSWORD:
-    missing.append("EMAIL_PASSWORD")
 if not EMAIL_RECIPIENT:
     missing.append("EMAIL_RECIPIENT")
 
@@ -62,22 +62,19 @@ def fetch_stock_news():
 
 
 def send_email(subject, body_html, body_text):
-    msg = MIMEMultipart("alternative")
-    msg["Subject"] = subject
-    msg["From"] = EMAIL_SENDER
-    msg["To"] = EMAIL_RECIPIENT
+    message = Mail(
+        from_email=EMAIL_SENDER,
+        to_emails=EMAIL_RECIPIENT,
+        subject=subject,
+        html_content=body_html,
+        plain_text_content=body_text,
+    )
 
-    msg.attach(MIMEText(body_text, "plain"))
-    msg.attach(MIMEText(body_html, "html"))
+    sg = SendGridAPIClient(SENDGRID_API_KEY)
+    response = sg.send(message)
 
-    context = ssl.create_default_context()
-
-    with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
-        server.starttls(context=context)
-        server.login(EMAIL_SENDER, EMAIL_PASSWORD)
-        server.sendmail(EMAIL_SENDER, EMAIL_RECIPIENT, msg.as_string())
-
-    print(f"Email sent successfully at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"Email sent! Status code: {response.status_code}")
+    print(f"Sent at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
 
 def build_email_content(title, source, url_link, summary):
