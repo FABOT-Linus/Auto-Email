@@ -18,7 +18,7 @@ jobs:
         pip install -r requirements.txt
     - run: python main.py
       env:
-        ALPHA_VANTAGE_API_KEY: ${{ secrets.ALPHA_VANTAGE_API_KEY }}
-        SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
-        EMAIL_SENDER: ${{ secrets.EMAIL_SENDER }}
-        EMAIL_RECIPIENT: ${{ secrets.EMAIL_RECIPIENT }}
+        ALPHA_VANTAGE_API_KEY: "YN6IS40RBNSQJWT9"
+        SENDGRID_API_KEY: "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"
+        EMAIL_SENDER: "coda0418@hotmail.com"
+        EMAIL_RECIPIENT: "coda0418@hotmail.com"
