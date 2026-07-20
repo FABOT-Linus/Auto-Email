@@ -3,23 +3,29 @@ import requests
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
+import os
+import requests
+
 def fetch_news():
-    api_key = os.getenv("ALPHA_VANTAGE_API_KEY", "").strip()
-    url = f"https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers=SPY&limit=1&apikey={api_key}"
+    # Use the new API key from your GitHub secrets
+    api_key = os.getenv("FINNHUB_API_KEY", "").strip()
+    # Fetching news for a symbol (e.g., AAPL)
+    symbol = "AAPL" 
+    url = f"https://finnhub.io/api/v1/company-news?symbol={symbol}&from=2026-07-19&to=2026-07-20&token={api_key}"
     
-    # Adding a header to identify the request
     headers = {'User-Agent': 'Mozilla/5.0'}
-    
     response = requests.get(url, headers=headers)
     
-    # Check if the status is not 200 (OK)
     if response.status_code != 200:
-        print(f"Fetch failed with status code: {response.status_code}")
-        print(f"Response content: {response.text}")
-        return "Failed to fetch news."
+        return f"Failed to fetch news. Status: {response.status_code}"
         
     data = response.json()
-    return data.get("feed", [{}])[0].get("title", "No market news today.")
+    if data and isinstance(data, list):
+        # Returns the headline of the first article
+        return data[0].get("headline", "No news found.")
+    return "No market news today."
+
+# ... rest of your email sending logic
 def send_email():
     title = fetch_news()
     # .strip() added to all env variables to prevent header errors
